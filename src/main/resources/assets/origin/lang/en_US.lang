@@ -1,0 +1,1 @@
+origin.commands.playerdata.usage=<playerdata|pdata> get <"health"|"maxHealth"|"hunger"|"saturation"> <username>\n<playerdata|pdata> set <"health"|"maxHealth"|"hunger"|"saturation"> <username> <value>

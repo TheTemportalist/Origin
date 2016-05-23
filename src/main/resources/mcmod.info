@@ -1,0 +1,16 @@
+[
+  {
+    "modid": "origin",
+    "name": "Origin",
+    "description": "A library mod for temportal needs.",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authors": ["TheTemportalist"],
+    "credits": "",
+    "logoFile": "logo.png",
+    "screenshots": [],
+    "dependencies": []
+  }
+]
