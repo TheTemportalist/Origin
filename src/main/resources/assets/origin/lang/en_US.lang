@@ -3,3 +3,7 @@ itemGroup.origin=Temportal
 command.worldmanip.usage=worldmanip <lift|liftHollow|gen|genHollow> cavern <PlayerName> [diameter=10] [distance above=10] [lift height=30]\n
 worldmanip <lift|liftHollow|gen|genHollow> box <width> <length> <height> <PlayerName> [distance above=10] [lift height=30]\n
 worldmanip <lift|liftHollow|gen|genHollow> sphere <PlayerName> [diameter=10] [distance above=10] [lift height=30]
+
+commands.icommand.player=Could not parse player string, nor get sender player.
+commands.origin.usage="origin < tp < [x] [y] [z] <Dimension Name:_> > >|< tpr <Player Name:_> <radius> >|< set <player> <health|hunger|sat> <number> >|< setMaxHealth <player> <amount> >"
+commands.oplevel.usage=/oplevel set <player> <level><BR>/oplevel get <player>
