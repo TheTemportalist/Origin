@@ -1,1 +1,5 @@
-origin.commands.playerdata.usage=<playerdata|pdata> get <"health"|"maxHealth"|"hunger"|"saturation"> <username>\n<playerdata|pdata> set <"health"|"maxHealth"|"hunger"|"saturation"> <username> <value>
+itemGroup.origin=Temportal
+
+command.worldmanip.usage=worldmanip <lift|liftHollow|gen|genHollow> cavern <PlayerName> [diameter=10] [distance above=10] [lift height=30]\n
+worldmanip <lift|liftHollow|gen|genHollow> box <width> <length> <height> <PlayerName> [distance above=10] [lift height=30]\n
+worldmanip <lift|liftHollow|gen|genHollow> sphere <PlayerName> [diameter=10] [distance above=10] [lift height=30]

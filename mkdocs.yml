@@ -1,0 +1,11 @@
+site_name: Origin Documentation
+pages:
+  - [index.md, Home]
+  - [format/index.md, Format, Home]
+  - [format/javadocs.md, Format, JavaDocs]
+  - [format/versioning.md, Format, Semantic Versioning]
+  - [format/depending.md, Format, Depending on Origin]
+  - [format/installing.md, Format, Adding the Library]
+  - [api/index.md, Api, The API]
+  - [foundation/index.md, Foundation, As a Foundation]
+  - [internal/index.md, Internal, Behind the Scenes]
