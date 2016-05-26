@@ -26,19 +26,15 @@ object HelperRayTrace {
 		vect
 	}
 
-	def getEndVect(entity: EntityLivingBase, reachDistance: Double,
+	def getEndVect(entity: EntityLivingBase, reachDistanceNonPlayer: Double = 5D,
 			startIn: Vect = null, partialTicks: Float = 1F): Vect = {
+		val reach =
+			entity match {
+				case player: EntityPlayer => Players.getReachDistance(player)
+				case _ => reachDistanceNonPlayer
+			}
 		(if (startIn != null) startIn else this.getStartVect(entity)) +
-				new Vect(entity.getLook(partialTicks)) * reachDistance
-	}
-
-	def getEndVect(entity: EntityLivingBase,
-			startIn: Vect = null, partialTicks: Float = 1F): Vect = {
-		entity match {
-			case player: EntityPlayer =>
-				this.getEndVect(player, Players.getReachDistance(player), startIn, partialTicks)
-			case _ => this.getEndVect(entity, 5D, startIn, partialTicks)
-		}
+				new Vect(entity.getLook(partialTicks)) * reach
 	}
 
 	// TODO https://github.com/TheTemportalist/Origin/blob/1.8.8/src/main/scala/temportalist/origin/api/common/utility/Cursor.scala#L62
