@@ -64,9 +64,8 @@ def createVersion() {
     proc.waitFor()
     println("Building on branch " + branch)
     def version = "${version_major}.${version_minor}.${version_patch}"
-    println(project.properties)
-    if (project.hasProperty("")) {
-
+    if (project.hasProperty("build_type") && "${build_type}" == "dev") {
+        version += "." + getBuildNumber()
     }
     else if (!branch.startsWith("master"))
         version += "." + getBuildNumber()
