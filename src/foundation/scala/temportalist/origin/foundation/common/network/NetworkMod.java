@@ -25,7 +25,7 @@ public abstract class NetworkMod implements IHasDetails {
 
 	protected void registerNetwork() {
 		if (this.network == null)
-			this.network = NetworkRegistry.INSTANCE.newSimpleChannel(this.getDetails().getModId());
+			this.network = NetworkRegistry.INSTANCE.newSimpleChannel(this.getNetworkName());
 	}
 
 	public SimpleNetworkWrapper getNetwork() {
