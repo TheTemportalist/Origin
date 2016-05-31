@@ -1,9 +1,11 @@
 package temportalist.origin.foundation.common.capability
 
+import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.{NBTBase, NBTTagCompound}
 import net.minecraft.util.{EnumFacing, ResourceLocation}
+import net.minecraft.world.World
 import net.minecraftforge.common.capabilities.Capability.IStorage
 import net.minecraftforge.common.capabilities.{Capability, CapabilityManager, ICapabilityProvider, ICapabilitySerializable}
 import net.minecraftforge.common.util.INBTSerializable
@@ -134,6 +136,7 @@ object ExtendedHandler {
 
 		@SubscribeEvent
 		final def onEntityJoinWorld(event: EntityJoinWorldEvent): Unit = {
+			this.onEntityJoinWorld(event.getWorld, event.getEntity)
 			if (event.getWorld.isRemote) return
 			if (this.networkMod == null) return
 
@@ -146,6 +149,8 @@ object ExtendedHandler {
 			}
 
 		}
+
+		def onEntityJoinWorld(world: World, entity: Entity): Unit = {}
 
 		// ~~~~~~~~~~ Capability Attaching ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
