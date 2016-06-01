@@ -1,9 +1,9 @@
 package temportalist.origin.foundation.common
 
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent
-import net.minecraftforge.fml.common.{FMLLog, Mod}
 import net.minecraftforge.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent, FMLServerStartingEvent}
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.{FMLLog, Mod}
 import org.apache.logging.log4j.Logger
 import temportalist.origin.foundation.common.modTraits._
 import temportalist.origin.foundation.common.network.NetworkMod
@@ -22,9 +22,21 @@ abstract class IModPlugin extends NetworkMod with IOptionHandler with Registry {
 
 	private var logger: Logger = _
 
-	final def log(format: String, data: AnyRef*): Unit = {
-		if (this.logger != null) this.logger.info(format, data:_*)
-		else FMLLog.info("[" + this.getDetails.getModName + "] " + format, data:_*)
+	final def log(obj: Any, data: AnyRef*): Unit = {
+		if (this.logger != null) {
+			if (data.nonEmpty) {
+				obj match {
+					case str: String =>
+						this.logger.info(str, data:_*)
+						return
+					case _ =>
+				}
+			}
+			this.logger.info(obj)
+		}
+		else {
+			FMLLog.info("[" + this.getDetails.getModId + "] " + obj, data:_*)
+		}
 	}
 
 	def getRegisters: Seq[Register] = Seq()
