@@ -36,12 +36,16 @@ object OverlayHealth extends IOverlay {
 
 	val heartSide: Int = 9
 
+	// based on https://github.com/SlimeKnights/TinkersConstruct/blob/1.7.10/src/main/java/tconstruct/armor/ArmorProxyClient.java#L229
 	override def pre(event: Pre): Unit = {
+		/*
 		val ticon_Valid: Boolean = !Loader.isModLoaded("TConstruct")
+		if (!ticon_Valid) return
+		*/
 		val rpghud_Valid: Boolean = !Loader.isModLoaded("rpghud")
 		val tukmc_Vz_borderlands_Valid: Boolean =
 			!Loader.isModLoaded("tukmc_Vz") || Loader.isModLoaded("borderlands")
-		if (!ticon_Valid || !rpghud_Valid || !tukmc_Vz_borderlands_Valid) return
+		if (!rpghud_Valid || !tukmc_Vz_borderlands_Valid) return
 		if (event.getType != ElementType.HEALTH) return
 
 		val reso = event.getResolution

@@ -1,7 +1,7 @@
 package temportalist.origin.foundation.client
 
 import net.minecraftforge.client.event.{MouseEvent, RenderGameOverlayEvent}
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.eventhandler.{EventPriority, SubscribeEvent}
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import temportalist.origin.api.client.EnumHUDOverlay
@@ -57,7 +57,7 @@ trait IModClient extends IHasMod {
 		types.foreach(this.overlays(_) += overlay)
 	}
 
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	final def pre(event: RenderGameOverlayEvent.Pre): Unit = {
 		this.overlays(EnumHUDOverlay.PRE).foreach(_.pre(event))
 	}
