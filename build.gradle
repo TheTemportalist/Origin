@@ -178,10 +178,6 @@ def getGitLog = {
 	return ret
 }
 
-task printLog() {
-	println "git log --pretty='format:%an: %s' e9adb1fb4fac3f2419c15216c21feb75d9ec98bc..HEAD".execute().text
-}
-
 curseforge {
 	println getGitLog()
 	if (project.hasProperty("tempCurseAPI"))
@@ -189,7 +185,7 @@ curseforge {
 	project {
 		id = curseID
 		releaseType = curseBuildType
-		changelog = getChangelog()
+		changelog = "Patch logger issue with backwards compatibility"
 		addGameVersion version_minecraft
 		addArtifact sourcesJar
 		relations {
