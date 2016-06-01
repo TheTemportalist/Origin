@@ -183,11 +183,11 @@ task printLog() {
 }
 
 curseforge {
-	println getGitLog
+	println getGitLog()
 	if (project.hasProperty("tempCurseAPI"))
 		apiKey = tempCurseAPI
 	project {
-		id = "" //curseID
+		id = curseID
 		releaseType = curseBuildType
 		changelog = getChangelog()
 		addGameVersion version_minecraft
