@@ -1,7 +1,5 @@
 package temportalist.origin.internal.common
 
-import net.minecraftforge.fml.common.FMLCommonHandler
-import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import temportalist.origin.foundation.common.registers.OptionRegister
 
 /**
@@ -23,12 +21,6 @@ object Options extends OptionRegister {
 	override def getExtension: String = "json"
 
 	override def register(): Unit = {
-		if (FMLCommonHandler.instance().getEffectiveSide.isClient) // if the jar is a client jar
-			this.registerClient()
-	}
-
-	@SideOnly(Side.CLIENT)
-	def registerClient() {
 
 		this.coloredHearts = this.getAndComment(
 			"client",
