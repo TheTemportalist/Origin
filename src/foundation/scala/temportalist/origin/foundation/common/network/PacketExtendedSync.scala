@@ -43,9 +43,11 @@ object PacketExtendedSync {
 		protected def syncClient(eID: Int, nbt: NBTTagCompound): Unit = {
 			val mc = Minecraft.getMinecraft
 			mc.addScheduledTask(new Runnable {
-				override def run(): Unit = mc.theWorld.getEntityByID(eID) match {
-					case e: Entity => deserialize(e, nbt)
-					case _ =>
+				override def run(): Unit = {
+					mc.theWorld.getEntityByID(eID) match {
+						case e: Entity => deserialize(e, nbt)
+						case _ =>
+					}
 				}
 			})
 		}

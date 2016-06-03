@@ -1,7 +1,7 @@
 package temportalist.origin.foundation.common.capability
 
 import net.minecraft.entity.Entity
-import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.nbt.{NBTBase, NBTTagCompound}
 import net.minecraft.util.{EnumFacing, ResourceLocation}
@@ -99,6 +99,7 @@ abstract class ExtendedHandler[N <: NBTBase, I <: INBTSerializable[N], C <: I, E
 	override def deserializeNBT(nbt: N): Unit = this.getDefaultImplementation.deserializeNBT(nbt)
 
 }
+
 object ExtendedHandler {
 
 	abstract class ExtendedEntity[N <: NBTTagCompound, I <: INBTSerializable[N], C <: I, E <: ICapabilityProvider](
@@ -113,7 +114,8 @@ object ExtendedHandler {
 			mod match {
 				case network: NetworkMod =>
 					this.networkMod = network
-					network.registerMessage(this.getPacketHandlingClass, classOf[PacketExtendedSync])
+					network.registerMessage(this.getPacketHandlingClass,
+						classOf[PacketExtendedSync])
 				case _ =>
 			}
 		}
@@ -126,10 +128,10 @@ object ExtendedHandler {
 
 		@SubscribeEvent
 		final def onPlayerClone(event: PlayerEvent.Clone): Unit = {
-			if (!this.doesDataPersistDeath || !event.isWasDeath ||
-					!classOf[EntityPlayer].isAssignableFrom(this.targetClass)) return
-			val data = this.get(event.getOriginal.asInstanceOf[E]).serializeNBT
-			this.get(event.getEntityPlayer.asInstanceOf[E]).deserializeNBT(data)
+			if (this.doesDataPersistDeath && event.isWasDeath) {
+				val data = this.get(event.getOriginal.asInstanceOf[E]).serializeNBT()
+				this.get(event.getEntityPlayer.asInstanceOf[E]).deserializeNBT(data)
+			}
 		}
 
 		// ~~~~~~~~~~ Syncing Server data to Client ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -143,9 +145,12 @@ object ExtendedHandler {
 			val entity = event.getEntity
 			if (this.isValid(entity)) {
 				val data = this.get(entity.asInstanceOf[E]).serializeNBT()
-				new PacketExtendedSync(
-					entity.getEntityId, data
-				).sendToDimension(this.networkMod, event.getWorld.provider.getDimension)
+				val packet = new PacketExtendedSync(entity.getEntityId, data)
+				packet.sendToDimension(this.networkMod, event.getWorld.provider.getDimension)
+				event.getEntity match {
+					case player: EntityPlayerMP => packet.sendToPlayer(this.networkMod, player)
+					case _ =>
+				}
 			}
 
 		}
@@ -164,7 +169,8 @@ object ExtendedHandler {
 					return
 				}
 				val obj = this
-				FMLLog.info("Attaching capability entity " + this.getKey.toString + " to " + e.getClass.getCanonicalName)
+				FMLLog.info("Attaching capability entity " + this.getKey.toString + " to " +
+						e.getClass.getCanonicalName)
 				event.addCapability(this.getKey, new ICapabilitySerializable[N] {
 
 					private var instance = obj.getDefaultImplementation
@@ -204,7 +210,8 @@ object ExtendedHandler {
 					FMLLog.info("ERROR: Capability for " + this.getKey.toString + " is NULL!!!")
 					return
 				}
-				FMLLog.info("Attaching capability tile " + this.getKey.toString + " to " + e.getClass.getCanonicalName)
+				FMLLog.info("Attaching capability tile " + this.getKey.toString + " to " +
+						e.getClass.getCanonicalName)
 				event.addCapability(this.getKey, this)
 			}
 		}
@@ -226,7 +233,8 @@ object ExtendedHandler {
 					FMLLog.info("ERROR: Capability for " + this.getKey.toString + " is NULL!!!")
 					return
 				}
-				FMLLog.info("Attaching capability item " + this.getKey.toString + " to " + item.getClass.getCanonicalName)
+				FMLLog.info("Attaching capability item " + this.getKey.toString + " to " +
+						item.getClass.getCanonicalName)
 				event.addCapability(this.getKey, this)
 			}
 		}
