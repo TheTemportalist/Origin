@@ -22,11 +22,6 @@ abstract class IModPlugin extends NetworkMod with IOptionHandler with Registry {
 
 	private var logger: Logger = _
 
-	@Deprecated
-	final def log(str: String, data: AnyRef*): Unit = {
-		this.log(str.asInstanceOf[Any], data:_*)
-	}
-
 	final def log(obj: Any, data: AnyRef*): Unit = {
 		if (this.logger != null) {
 			if (data.nonEmpty) {
