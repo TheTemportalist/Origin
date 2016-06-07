@@ -185,7 +185,7 @@ curseforge {
 	project {
 		id = curseID
 		releaseType = curseBuildType
-		changelog = "Patch logger issue with backwards compatibility"
+		changelog = "Add small additions (like annotation loaders)"
 		addGameVersion version_minecraft
 		addArtifact sourcesJar
 		relations {
