@@ -188,8 +188,5 @@ curseforge {
 		changelog = "Add small additions (like annotation loaders)"
 		addGameVersion version_minecraft
 		addArtifact sourcesJar
-		relations {
-			requiredLibrary 'origin'
-		}
 	}
 }
