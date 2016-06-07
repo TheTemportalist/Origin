@@ -38,8 +38,10 @@ class AnnotationLoader[C, T](private val annotation: Class[C], private val insta
 			}
 		}
 		this.mapKeys ++= this.classInstances.keySet
-		this.mapKeys = this.mapKeys.sortWith(_.getSimpleName < _.getSimpleName)
+		this.mapKeys = this.mapKeys.sortWith(this.keySorter)
 	}
+
+	def keySorter(a: Class[_ <: T], b: Class[_ <: T]): Boolean = a.getSimpleName < b.getSimpleName
 
 	def onAnnotationClassFound[I <: T](implementer: Class[I], info: mutable.Map[String, AnyRef]): Unit = {}
 
