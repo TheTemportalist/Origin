@@ -37,8 +37,7 @@ class AnnotationLoader[C, T](private val annotation: Class[C], private val insta
 					e.printStackTrace()
 			}
 		}
-		this.mapKeys ++= this.classInstances.keySet
-		this.mapKeys = this.mapKeys.sortWith(this.keySorter)
+		this.mapKeys ++= this.classInstances.keySet.toSeq.sortWith(this.keySorter)
 	}
 
 	def keySorter(a: Class[_ <: T], b: Class[_ <: T]): Boolean = a.getSimpleName < b.getSimpleName
