@@ -37,8 +37,8 @@ trait IExtendedEntitySync[N <: NBTTagCompound, E <: Entity] extends INBTSerializ
 	}
 
 	def sendNBTToClient(entity: E, nbt: NBTTagCompound): Unit = {
-		this.constructPacket(entity, nbt).sendToAllAround(
-			this.getNetworkMod, this.getPacketTargetPoint(entity))
+		this.constructPacket(entity, nbt).sendToDimension(
+			this.getNetworkMod, entity.getEntityWorld.provider.getDimension)
 	}
 
 	def sendNBTToServer(entity: E, nbt: NBTTagCompound): Unit = {
