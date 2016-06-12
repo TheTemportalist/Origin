@@ -6,19 +6,26 @@ buildscript {
 			name = "forge"
 			url = "http://files.minecraftforge.net/maven"
 		}
+		/*
 		maven {
 			// for cursegradle
 			url = "https://plugins.gradle.org/m2/"
 		}
+		*/
 	}
 	dependencies {
 		classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
 		// for cursegradle
-		classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.0.7"
+		//classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.0.7"
 	}
 }
 
-apply plugin: 'com.matthewprenger.cursegradle'
+plugins {
+	id "com.matthewprenger.cursegradle" version "1.0.7"
+	id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "1.32"
+}
+
+// apply plugin: 'com.matthewprenger.cursegradle'
 apply plugin: 'scala'
 
 sourceSets {
@@ -63,12 +70,18 @@ minecraft {
 	replace "@MOD_VERSION@", "${version_major}.${version_minor}.${version_patch}"
 }
 
+def getBranch() {
+	if (project.hasProperty("GIT_BRANCH"))
+		return "${GIT_BRANCH}"
+	else {
+		def proc = "git rev-parse --abbrev-ref HEAD".execute()
+		proc.waitFor()
+		return proc.text.trim()
+	}
+}
+
 def createVersion() {
-	def branch = ""
-	def proc = "git rev-parse --abbrev-ref HEAD".execute()
-	proc.in.eachLine { line -> branch = line }
-	proc.err.eachLine { line -> println line }
-	proc.waitFor()
+	def branch = getBranch()
 	println("Building on branch " + branch)
 	def version = "${version_major}.${version_minor}.${version_patch}"
 	if (project.hasProperty("build_type")) {
@@ -173,21 +186,92 @@ uploadArchives {
 	}
 }
 
-def getGitLog = {
-	def ret = "git log --pretty='format:%an: %s' e9adb1fb4fac3f2419c15216c21feb75d9ec98bc..HEAD".execute().text
-	return ret
-}
-
 curseforge {
-	println getGitLog()
 	if (project.hasProperty("tempCurseAPI"))
 		apiKey = tempCurseAPI
 	project {
-		id = curseID
+		//id = curseID
 		releaseType = curseBuildType
 		changelog = file('changelog.html')
 		changelogType = 'html'
 		addGameVersion version_minecraft
 		addArtifact sourcesJar
 	}
+}
+
+task makeChangelog(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
+	filePath = "changelog.html"
+	untaggedName = "${project.version}"
+	fromCommit = "${fromCommit}"
+	toRef = "HEAD"
+	templateContent = file('changelog.min.html').getText("UTF-8")
+}
+
+afterEvaluate {
+	tasks["curseforge${curseID}"].dependsOn.add(makeChangelog)
+}
+
+/*
+task compileChangelog() {
+	dependsOn makeChangelog
+	doLast {
+		def changelog_file = new File('changelog.html')
+		if (!changelog_file.exists()) return
+		def changelog = changelog_file.getText("UTF-8")
+		def changelog_file_new = new File("changelogNew.html")
+		if (changelog_file_new.exists()) {
+			def changelog_new = changelog_file_new.getText("UTF-8")
+			changelog_file.setText(changelog_new + changelog)
+			changelog_file_new.delete()
+		}
+	}
+}
+
+def buildInfo() {
+	def cmd = "git rev-parse HEAD"
+	def proc = cmd.execute()
+	proc.waitFor()
+	return proc.text.trim()
+}
+
+task updateLastGitCommit {
+	dependsOn compileChangelog
+	doLast {
+		if (project.hasProperty("GIT_COMMIT")) {
+			def commit = buildInfo()
+			ant.replace(
+					file: "gradle.properties",
+					token: "fromCommit=${fromCommit}",
+					value: "fromCommit=" + commit
+			)
+		}
+	}
+}
+*/
+
+task release { // Done locally to execute a release on CI to curseforge
+
+	def branch = getBranch()
+
+	/** Tag with version */
+
+	"git tag ${version}".execute().waitFor()
+
+	/** Push to BRANCH */
+
+	("git push -u origin " + branch + " --tags").execute().waitFor()
+
+	/** Merge current branch with master */
+
+	"git checkout master".execute().waitFor()
+	("git merge " + branch).execute().waitFor()
+
+	/** Push with content AND tags */
+
+	"git push -u origin master --tags".execute().waitFor()
+
+	/** Checkout BRANCH */
+
+	("git checkout " + branch).execute().waitFor()
+
 }
