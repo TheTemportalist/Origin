@@ -6,17 +6,9 @@ buildscript {
 			name = "forge"
 			url = "http://files.minecraftforge.net/maven"
 		}
-		/*
-		maven {
-			// for cursegradle
-			url = "https://plugins.gradle.org/m2/"
-		}
-		*/
 	}
 	dependencies {
 		classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
-		// for cursegradle
-		//classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.0.7"
 	}
 }
 
@@ -25,7 +17,6 @@ plugins {
 	id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "1.32"
 }
 
-// apply plugin: 'com.matthewprenger.cursegradle'
 apply plugin: 'scala'
 
 sourceSets {
@@ -132,6 +123,8 @@ processResources {
 
 }
 
+// ~~~~~ Start: Maven ~~~~~
+
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
@@ -185,6 +178,8 @@ uploadArchives {
 		}
 	}
 }
+
+// ~~~~~ Start: CurseForge & Changelogs ~~~~~
 
 curseforge {
 	if (project.hasProperty("tempCurseAPI"))
@@ -240,3 +235,5 @@ task release { // Done locally to execute a release on CI to curseforge
 
 	}
 }
+
+// ~~~~~ End ~~~~~
