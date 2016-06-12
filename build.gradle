@@ -187,10 +187,10 @@ uploadArchives {
 }
 
 curseforge {
-	if (project.hasProperty("tempCurseAPI"))
-		apiKey = tempCurseAPI
+	//if (project.hasProperty("tempCurseAPI"))
+	//	apiKey = tempCurseAPI
 	project {
-		//id = curseID
+		id = curseID
 		releaseType = curseBuildType
 		changelog = file('changelog.html')
 		changelogType = 'html'
@@ -202,7 +202,7 @@ curseforge {
 task makeChangelog(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
 	filePath = "changelog.html"
 	untaggedName = "${project.version}"
-	fromCommit = "${fromCommit}"
+	fromCommit = "dcb26de2989a86e8ccc6f00f6b213302c28cfe35"
 	toRef = "HEAD"
 	templateContent = file('changelog.min.html').getText("UTF-8")
 }
@@ -211,67 +211,32 @@ afterEvaluate {
 	tasks["curseforge${curseID}"].dependsOn.add(makeChangelog)
 }
 
-/*
-task compileChangelog() {
-	dependsOn makeChangelog
-	doLast {
-		def changelog_file = new File('changelog.html')
-		if (!changelog_file.exists()) return
-		def changelog = changelog_file.getText("UTF-8")
-		def changelog_file_new = new File("changelogNew.html")
-		if (changelog_file_new.exists()) {
-			def changelog_new = changelog_file_new.getText("UTF-8")
-			changelog_file.setText(changelog_new + changelog)
-			changelog_file_new.delete()
-		}
-	}
-}
-
-def buildInfo() {
-	def cmd = "git rev-parse HEAD"
-	def proc = cmd.execute()
-	proc.waitFor()
-	return proc.text.trim()
-}
-
-task updateLastGitCommit {
-	dependsOn compileChangelog
-	doLast {
-		if (project.hasProperty("GIT_COMMIT")) {
-			def commit = buildInfo()
-			ant.replace(
-					file: "gradle.properties",
-					token: "fromCommit=${fromCommit}",
-					value: "fromCommit=" + commit
-			)
-		}
-	}
-}
-*/
-
 task release { // Done locally to execute a release on CI to curseforge
+	doLast {
 
-	def branch = getBranch()
+		def branch = getBranch()
+		def version = "${version_major}.${version_minor}.${version_patch}"
 
-	/** Tag with version */
+		/** Tag with version */
 
-	"git tag ${version}".execute().waitFor()
+		("git tag " + version).execute().waitFor()
 
-	/** Push to BRANCH */
+		/** Push to BRANCH */
 
-	("git push -u origin " + branch + " --tags").execute().waitFor()
+		("git push -u origin " + branch + " --tags").execute().waitFor()
 
-	/** Merge current branch with master */
+		/** Merge current branch with master */
 
-	"git checkout master".execute().waitFor()
-	("git merge " + branch).execute().waitFor()
+		"git checkout master".execute().waitFor()
+		("git merge " + branch).execute().waitFor()
 
-	/** Push with content AND tags */
+		/** Push with content AND tags */
 
-	"git push -u origin master --tags".execute().waitFor()
+		"git push -u origin master --tags".execute().waitFor()
 
-	/** Checkout BRANCH */
+		/** Checkout BRANCH */
 
-	("git checkout " + branch).execute().waitFor()
+		("git checkout " + branch).execute().waitFor()
 
+	}
 }
