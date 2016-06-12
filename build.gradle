@@ -185,7 +185,8 @@ curseforge {
 	project {
 		id = curseID
 		releaseType = curseBuildType
-		changelog = "Patch annotation loader and packets of capability entities"
+		changelog = file('changelog.html')
+		changelogType = 'html'
 		addGameVersion version_minecraft
 		addArtifact sourcesJar
 	}
