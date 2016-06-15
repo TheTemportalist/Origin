@@ -14,7 +14,7 @@ buildscript {
 		}
 	}
 	dependencies {
-		classpath "gradle.plugin.temportalist:AutomataGradle:0.0.1.30"
+		classpath "gradle.plugin.temportalist:AutomataGradle:0.0.1.31"
 	}
 }
 
@@ -135,8 +135,7 @@ automata {
 	// ~~~~~ End: Resources
 
 	// ~~~ Start: CurseForge
-	if (project.hasProperty("tempCurseAPI"))
-		curseKey = tempCurseAPI
+	if (project.hasProperty("tempCurseAPI")) curseKey = tempCurseAPI
 	curseProject {
 		id = curseID
 		releaseType = "release"
