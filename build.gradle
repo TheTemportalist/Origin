@@ -142,7 +142,7 @@ automata {
 		releaseType = "release"
 		changelog = file('changelog.html')
 		changelogType = 'html'
-		addGameVersion getVersionMinecraft()
+		addGameVersion getVersionMinecraft() // Automata function
 		addArtifact sourcesJar
 	}
 	// ~~~~~ End: CurseForge
@@ -150,7 +150,7 @@ automata {
 	// ~~~ Start: Archives
 	if (project.hasProperty("dddUser") && project.hasProperty("dddPass")) {
 		archives {
-			name = "Origin"
+			name = "Origin-" + getVersionMinecraft()
 			description = project.gitName
 			repoUrl = "http://doubledoordev.net:8082/artifactory/mods"
 			repoUsername = dddUser
