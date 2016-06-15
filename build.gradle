@@ -14,7 +14,7 @@ buildscript {
 		}
 	}
 	dependencies {
-		classpath "gradle.plugin.temportalist:AutomataGradle:0.0.1.28"
+		classpath "gradle.plugin.temportalist:AutomataGradle:0.0.1.29"
 	}
 }
 
@@ -68,7 +68,7 @@ ext {
 	gitName = "Origin"
 	gitBase = "https://github.com/TheTemportalist/" + project.gitName
 	gitUrl = project.gitBase
-	mcVersion = "1.9.4"
+	curseID = "72503"
 }
 
 def getBranch() {
@@ -117,7 +117,7 @@ automata {
 	// ~~~~~ End: Versioning
 
 	// ~~~ Start: Forge Data
-	versionMinecraft = project.mcVersion
+	versionMinecraft = "1.9.4"
 	versionForge = "12.17.0.1963"
 	versionMappings = "snapshot_20160518"
 	// ~~~~~ End: Forge Data
@@ -138,11 +138,11 @@ automata {
 	if (project.hasProperty("tempCurseAPI"))
 		curseKey = tempCurseAPI
 	curseProject {
-		id = "72503"
+		id = curseID
 		releaseType = "release"
 		changelog = file('changelog.html')
 		changelogType = 'html'
-		addGameVersion project.mcVersion
+		addGameVersion getVersionMinecraft()
 		addArtifact sourcesJar
 	}
 	// ~~~~~ End: CurseForge
@@ -193,7 +193,7 @@ task release { // Done locally to execute a release on CI to curseforge
 	doLast {
 
 		def branch = getBranch()
-		def version = "${version_major}.${version_minor}.${version_patch}"
+		def version = automata.getVersionStr()
 
 		/** Tag with version */
 
