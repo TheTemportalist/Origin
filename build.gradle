@@ -1,90 +1,42 @@
-// For those who want the bleeding edge
+
+// Using old gradle because ForgeGradle needs maven for snapshots,
+// and because ForgeGradle doesn't like sourceSets outside of api, main, and test
+
 buildscript {
 	repositories {
 		jcenter()
 		maven {
-			name = "forge"
-			url = "http://files.minecraftforge.net/maven"
+			name "forge"
+			url "http://files.minecraftforge.net/maven"
+		}
+		maven {
+			url "https://plugins.gradle.org/m2/"
 		}
 	}
 	dependencies {
-		classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+		classpath "gradle.plugin.temportalist:AutomataGradle:0.0.1.25"
 	}
 }
 
+// ~~~ Start: Gradle plugin application
 plugins {
-	id "com.matthewprenger.cursegradle" version "1.0.7"
+	id 'java'
+	id 'scala'
 	id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "1.32"
 }
+// ~~~~~ End: Gradle plugin application
 
-apply plugin: 'scala'
+// ~~~ Start: Java Compatibility
+sourceCompatibility = JavaVersion.VERSION_1_7
+targetCompatibility = JavaVersion.VERSION_1_7
+// ~~~~~ End: Java Compatibility
 
+// ~~~ Start: SourceSets
 sourceSets {
 	foundation;
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
-
-repositories {
-
-}
-
-dependencies {
-
-}
-
-ext.getBuildNumber = {
-	if (System.getenv("BUILD_NUMBER") != null) return "${System.getenv("BUILD_NUMBER")}"
-	else if (project.hasProperty("bambooBuildNumber")) return project.bambooBuildNumber
-	else return getDate()
-}
-
-def getDate() {
-	def date = new Date()
-	def formattedDate = date.format('MM_dd_yyyy_HH_mm_ss')
-	return formattedDate
-}
-
-group = "${org}.${groupName}"
-
-// java version
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
-// end java version
-
-minecraft {
-	version = "${version_minecraft}-${version_forge}${version_forge_b}"
-	runDir = "run"
-	mappings = "${version_mcp}"
-
-	replace "required-after:Forge", "required-after:Forge@[${version_forge},)"
-	replace "@MOD_VERSION@", "${version_major}.${version_minor}.${version_patch}"
-}
-
-def getBranch() {
-	if (project.hasProperty("GIT_BRANCH"))
-		return "${GIT_BRANCH}"
-	else {
-		def proc = "git rev-parse --abbrev-ref HEAD".execute()
-		proc.waitFor()
-		return proc.text.trim()
-	}
-}
-
-def createVersion() {
-	def branch = getBranch()
-	println("Building on branch " + branch)
-	def version = "${version_major}.${version_minor}.${version_patch}"
-	if (project.hasProperty("build_type")) {
-		if (build_type == "dev") version += "." + getBuildNumber()
-	} else if (!branch.startsWith("master"))
-		version += "." + getBuildNumber()
-	println("Bulding with version " + version)
-	return version
-}
-
-archivesBaseName = "${archiveName}-${project.minecraft.version}"
-version = createVersion()
+apply plugin: 'temportalist.automata' // Apply Automata
 
 sourceSets {
 	foundation.compileClasspath += api.compileClasspath
@@ -108,92 +60,123 @@ task sourcesJar(type: Jar) {
 
 tasks.build.dependsOn sourcesJar
 
-processResources {
-	inputs.property "version", project.version
-	inputs.property "mcversion", project.minecraft.version
+// ~~~~~ End: SourceSets
 
-	from(sourceSets.main.resources.srcDirs) {
-		include 'mcmod.info'
-		expand 'version': project.version, 'mcversion': project.minecraft.version
-	}
+// ~~~ Start: Automata
 
-	from(sourceSets.main.resources.srcDirs) {
-		exclude 'mcmod.info'
-	}
-
+ext {
+	gitName = "Origin"
+	gitBase = "https://github.com/TheTemportalist/" + project.gitName
+	gitUrl = project.gitBase
+	mcVersion = "1.9.4"
 }
 
-// ~~~~~ Start: Maven ~~~~~
-
-apply plugin: 'maven'
-apply plugin: 'maven-publish'
-
-uploadArchives {
-	repositories {
-		// official DDD maven stuffs
-		if (project.hasProperty("dddUser") && project.hasProperty("dddPass")) {
-			mavenDeployer {
-				repository(url: "http://doubledoordev.net:8082/artifactory/mods") {
-					authentication(userName: dddUser, password: dddPass)
-				}
-				pom {
-					groupId = project.group
-					version = project.version
-					artifactId = "${archiveName}"
-					project {
-						name project.archivesBaseName
-						packaging 'jar'
-						description '${gitConfig.gitName}'
-						url 'https://github.com/TheTemportalist/${gitConfig.gitName}'
-
-						scm {
-							url 'https://github.com/TheTemportalist/${gitConfig.gitName}'
-							connection 'scm:git:git://github.com/TheTemportalist/${gitConfig.gitName}.git'
-							developerConnection 'scm:git:git@github.com:TheTemportalist/${gitConfig.gitName}.git'
-						}
-
-						issueManagement {
-							system 'github'
-							url 'https://github.com/TheTemportalist/${gitConfig.gitName}/issues'
-						}
-
-						licenses {
-							license {
-								name '${gitConfig.license}'
-								url 'https://github.com/TheTemportalist/${gitConfig.gitName}/blob/master/LICENSE'
-								distribution 'repo'
-							}
-						}
-
-						developers {
-							developer {
-								id 'TheTemportalist'
-								name 'TheTemportalist'
-								roles { role 'developer' }
-							}
-						}
-					}
-				}
-			}
-		}
+def getBranch() {
+	if (project.hasProperty("GIT_BRANCH"))
+		return "${GIT_BRANCH}"
+	else {
+		def proc = "git rev-parse --abbrev-ref HEAD".execute()
+		proc.waitFor()
+		return proc.text.trim()
 	}
 }
 
-// ~~~~~ Start: CurseForge & Changelogs ~~~~~
+def getDate() {
+	def date = new Date()
+	def formattedDate = date.format('MM_dd_yyyy_HH_mm_ss')
+	return formattedDate
+}
 
-curseforge {
+def getBuildNumber() {
+	if (System.getenv("BUILD_NUMBER") != null) return "${System.getenv("BUILD_NUMBER")}"
+	else if (project.hasProperty("bambooBuildNumber")) return project.bambooBuildNumber
+	else return getDate()
+}
+
+automata {
+
+	// ~~~ Start: Project ID
+	organization = "temportalist"
+	groupName = "origin"
+	// ~~~~~ End: Project ID
+
+	// ~~~ Start: Versioning
+	versionMajor = 9
+	versionMinor = 1
+	versionPatch = 8
+
+	if (project.hasProperty("MANUAL"))
+		manualBuildNumber = MANUAL
+
+	def branch = getBranch()
+	if (project.hasProperty("build_type")) {
+		if (build_type == "dev")
+			autoBuildNumber = getBuildNumber()
+	} else if (!branch.startsWith("master"))
+		autoBuildNumber = getBuildNumber()
+	// ~~~~~ End: Versioning
+
+	// ~~~ Start: Forge Data
+	versionMinecraft = project.mcVersion
+	versionForge = "12.17.0.1963"
+	versionMappings = "snapshot_20160518"
+	// ~~~~~ End: Forge Data
+
+	// ~~~ Start: Replacements
+	replace { // MUST be defined after "Versioning" and "Forge Data"
+		version = "@MOD_VERSION@"
+		forge = 'required-after:Forge'
+		replaceMap = [:]
+	}
+	// ~~~~~ End: Replacements
+
+	// ~~~ Start: Resources
+	resources = true
+	// ~~~~~ End: Resources
+
+	// ~~~ Start: CurseForge
 	if (project.hasProperty("tempCurseAPI"))
-		apiKey = tempCurseAPI
-	project {
-		id = curseID
-		releaseType = curseBuildType
+		curseKey = tempCurseAPI
+	curseProject {
+		id = "72503"
+		releaseType = "release"
 		changelog = file('changelog.html')
 		changelogType = 'html'
-		addGameVersion version_minecraft
+		addGameVersion project.mcVersion
 		addArtifact sourcesJar
 	}
+	// ~~~~~ End: CurseForge
+
+	// ~~~ Start: Archives
+	if (project.hasProperty("dddUser") && project.hasProperty("dddPass")) {
+		archives {
+			name = "Origin"
+			description = project.gitName
+			repoUrl = "http://doubledoordev.net:8082/artifactory/mods"
+			repoUsername = dddUser
+			repoPassword = dddPass
+			sourceUrl = project.gitUrl
+			scmUrl = "scm:git:git://github.com/TheTemportalist/" + project.gitName + ".git"
+			issueTrackerType = "github"
+			issueTrackerUrl = project.gitBase + "issues"
+			licenseType = "Apache License Version 2.0"
+			licenseUrl = project.gitUrl + "LICENSE"
+			developers = [
+					[
+							"id": "TheTemportalist",
+							"name": "The Temportalist",
+							"role": "developer"
+					]
+			]
+		}
+	}
+	// ~~~~~ End: Archives
+
 }
 
+// ~~~~~ End: Automata
+
+// ~~~ Start: Changelogs
 task makeChangelog(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
 	filePath = "changelog.html"
 	untaggedName = "${project.version}"
@@ -235,5 +218,4 @@ task release { // Done locally to execute a release on CI to curseforge
 
 	}
 }
-
-// ~~~~~ End ~~~~~
+// ~~~~~ End: Changelogs
