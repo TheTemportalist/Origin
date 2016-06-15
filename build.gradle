@@ -14,7 +14,7 @@ buildscript {
 		}
 	}
 	dependencies {
-		classpath "gradle.plugin.temportalist:AutomataGradle:0.0.1.26"
+		classpath "gradle.plugin.temportalist:AutomataGradle:0.0.1.27"
 	}
 }
 
