@@ -14,7 +14,7 @@ buildscript {
 		}
 	}
 	dependencies {
-		classpath "gradle.plugin.temportalist:AutomataGradle:0.0.1.33"
+		classpath "gradle.plugin.temportalist:AutomataGradle:0.0.1.54"
 	}
 }
 
@@ -22,7 +22,6 @@ buildscript {
 plugins {
 	id 'java'
 	id 'scala'
-	id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "1.32"
 }
 // ~~~~~ End: Gradle plugin application
 
@@ -71,28 +70,6 @@ ext {
 	curseID = "72503"
 }
 
-def getBranch() {
-	if (project.hasProperty("GIT_BRANCH"))
-		return "${GIT_BRANCH}"
-	else {
-		def proc = "git rev-parse --abbrev-ref HEAD".execute()
-		proc.waitFor()
-		return proc.text.trim()
-	}
-}
-
-def getDate() {
-	def date = new Date()
-	def formattedDate = date.format('MM_dd_yyyy_HH_mm_ss')
-	return formattedDate
-}
-
-def getBuildNumber() {
-	if (System.getenv("BUILD_NUMBER") != null) return "${System.getenv("BUILD_NUMBER")}"
-	else if (project.hasProperty("bambooBuildNumber")) return project.bambooBuildNumber
-	else return getDate()
-}
-
 automata {
 
 	// ~~~ Start: Project ID
@@ -123,10 +100,11 @@ automata {
 	// ~~~~~ End: Forge Data
 
 	// ~~~ Start: Replacements
+	// Note, that this only affects the jar, and not sources
 	replace { // MUST be defined after "Versioning" and "Forge Data"
-		version = "@MOD_VERSION@"
-		forge = 'required-after:Forge'
-		replaceMap = [:]
+		version = "@MOD_VERSION@" // recommended
+		forge = 'required-after:Forge' // recommended
+		replaceMap = [:] // optional
 	}
 	// ~~~~~ End: Replacements
 
@@ -134,13 +112,22 @@ automata {
 	resources = true
 	// ~~~~~ End: Resources
 
+	// ~~~ Start: Changelog
+	changelog { // MUST be defined before it's corresponding curseProject block (if linked)
+		id = curseID
+		fileExtension = 'html'
+		template = file('changelog.min.html').getText("UTF-8")
+		fromRef = 'dcb26de2989a86e8ccc6f00f6b213302c28cfe35'
+		toRef = 'HEAD'
+	}
+	// ~~~~~ End: Changelog
+
 	// ~~~ Start: CurseForge
 	if (project.hasProperty("tempCurseAPI")) curseKey = tempCurseAPI
 	curseProject {
 		id = curseID
 		releaseType = "release"
-		changelog = file('changelog.html')
-		changelogType = 'html'
+		// Changelog file generated and set by automata
 		addGameVersion getVersionMinecraft() // Automata function
 		addArtifact sourcesJar
 	}
@@ -176,22 +163,11 @@ automata {
 // ~~~~~ End: Automata
 
 // ~~~ Start: Changelogs
-task makeChangelog(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
-	filePath = "changelog.html"
-	untaggedName = "${project.version}"
-	fromCommit = "dcb26de2989a86e8ccc6f00f6b213302c28cfe35"
-	toRef = "HEAD"
-	templateContent = file('changelog.min.html').getText("UTF-8")
-}
-
-afterEvaluate {
-	tasks["curseforge${curseID}"].dependsOn.add(makeChangelog)
-}
 
 task release { // Done locally to execute a release on CI to curseforge
 	doLast {
 
-		def branch = getBranch()
+		def branch = automata.getBranch()
 		def version = automata.getVersionStr()
 
 		/** Tag with version */
@@ -217,4 +193,5 @@ task release { // Done locally to execute a release on CI to curseforge
 
 	}
 }
+
 // ~~~~~ End: Changelogs
