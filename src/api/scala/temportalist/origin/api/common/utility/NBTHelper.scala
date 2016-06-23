@@ -3,7 +3,6 @@ package temportalist.origin.api.common.utility
 import java.util
 import java.util.UUID
 
-import net.minecraft.nbt.NBTBase.NBTPrimitive
 import net.minecraft.nbt._
 import net.minecraftforge.fml.common.{FMLLog, ObfuscationReflectionHelper}
 import temportalist.origin.api.common.INBTSaver

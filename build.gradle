@@ -78,9 +78,9 @@ automata {
 	// ~~~~~ End: Project ID
 
 	// ~~~ Start: Versioning
-	versionMajor = 9
-	versionMinor = 1
-	versionPatch = 8
+	versionMajor = 10
+	versionMinor = 0
+	versionPatch = 0
 
 	if (project.hasProperty("MANUAL"))
 		manualBuildNumber = MANUAL
@@ -94,8 +94,8 @@ automata {
 	// ~~~~~ End: Versioning
 
 	// ~~~ Start: Forge Data
-	versionMinecraft = "1.9.4"
-	versionForge = "12.17.0.1963"
+	versionMinecraft = "1.10"
+	versionForge = "12.18.0.1986-1.10.0"
 	versionMappings = "snapshot_20160518"
 	// ~~~~~ End: Forge Data
 
